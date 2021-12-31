@@ -7,6 +7,10 @@ Parameters:
     Description: Arn for the GitHub OIDC Provider.
     Default: ""
     Type: String
+  GitHubOrg: #
+    Type: String
+  RepositoryName:
+    Type: String
 
 Conditions:
   CreateOIDCProvider: !Equals
@@ -23,6 +27,21 @@ Resources:
         - sts.amazonaws.com
       ThumbprintList:
         - a031c46782e6e6c662c2c87c76da9aa62ccabd8e
+  GithubActionsExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: !If
+                - CreateOIDCProvider
+                - !Ref GithubOidc
+                - !Ref OIDCProviderArn
+            Condition:
+              StringLike:
+                token.actions.githubusercontent.com:sub: !Sub repo:${GitHubOrg}/${RepositoryName}:*
 
 Outputs:
   OIDC:
@@ -31,3 +50,7 @@ Outputs:
     Description: "Github OIDC ARN. For Github actions automation."
     Export:
       Name: github-actions-oidc-arn
+  Role:
+    Value: !GetAtt GithubActionsExecutionRole.Arn
+    Export:
+      Name: github-actions-execution-role
