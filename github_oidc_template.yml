@@ -28,3 +28,6 @@ Outputs:
   OIDC:
     Condition: CreateOIDCProvider
     Value: !Ref GithubOidc
+    Description: "Github OIDC ARN. For Github actions automation."
+    Export:
+      Name: github-actions-oidc-arn
