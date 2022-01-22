@@ -30,6 +30,16 @@ Resources:
   GithubActionsExecutionRole:
     Type: AWS::IAM::Role
     Properties:
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - "cloudfront: CreateInvalidation"
+                Resource:
+                  - "*"
+          PolicyName: AllowCloudFrontInvalidation
       AssumeRolePolicyDocument:
         Statement:
           - Effect: Allow
